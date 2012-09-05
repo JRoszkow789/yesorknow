@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block header %}Ask a question!{% endblock %}
+{% block content %}
+{% from "macros.html" import render_field %}
+    <form method="POST" action="{{ url_for('add_question') }}">
+        {{ form.csrf_token }}
+        {% if categories %}
+            <select name="category">
+            {% for cat in categories %}
+                <option value="{{ cat[0] }}">{{ cat[1] }}</option>
+            {% endfor %}
+            </select>
+        {% endif %}
+        {{ render_field(form.question_text) }}
+        <input type="submit" class="btn" value="ask!" />
+    </form>
+    <a href="{{ url_for('homepage') }}">back...</a>
+{% endblock %}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>{% block title %}Yes or Know?{% endblock %}</title>
+	<link rel="stylesheet" type="text/css"\
+		  href="{{ url_for('static', filename='style.css') }}" />
+	<link rel="stylesheet" type="text/css" \
+		  href="{{ url_for('static', filename='mystyle.css') }}" />
+</head>
+
+<body>
+<div class="container">
+<div class="row">
+	<div class="span 4 offset8 righty">
+		<h4 >
+		{% if not session.user_id %}
+			<a href="{{ url_for('login') }}">Log in</a>
+		{% else %}
+			<a href="{{ url_for('logout') }}">Logout</a>
+		{% endif %}
+		</h4>
+	</div>
+</div>
+
+<!-- Header area. -->
+<div class="row page-header">
+	<div class="span8 offset2">
+        <a href="{{ url_for('homepage') }}">
+            <h1 class="logo">{{ header }}</h1>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+	<div class="span6 offset3">
+		<ul class="unstyled">
+		{% for msg in get_flashed_messages() %}
+			<li>{{ msg }}</li>
+		{% endfor %}
+		</ul>
+	</div>
+</div>
+
+<!-- Main Body/Content area. -->
+{% block content %}{% endblock %}
+
+<!-- Footer Area -->
+<div class="row">
+	<div class="span6 offset3 navbar center">
+		<ul class="nav">
+			<li><a href="#">Footer</a></li>
+			<li><a href="#">Links</a></li>
+			<li><a href="#">Area</a></li>
+		</ul>
+	</div>
+</div>
+</div>
+</body>
+</html>

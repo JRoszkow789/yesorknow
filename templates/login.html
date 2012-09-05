@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}User Login{% endblock %}
+{% block header %}Login or No?{% endblock %}
+{% block content %}
+    <div class="span6 offset3 well">
+    {% from "macros.html" import render_field %}
+        <form method="POST" action="{{ url_for('login') }}">
+            {{ form.csrf_token }}
+            {{ render_field(form.username) }}
+            {{ render_field(form.password) }}
+            <input type="submit" class="btn" value="login" />
+        </form>   
+        <a href="{{ url_for('registration') }}">register</a>
+    </div>
+{% endblock %}

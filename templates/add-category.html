@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block header %}Add category{% endblock %}
+{% block content %}
+{% from "macros.html" import render_field %}
+    <form method="POST" action="{{ url_for('add_category') }}">
+        {{ form.csrf_token }}
+        {{ render_field(form.categoryname) }}
+        <input type="submit" value="submit category" class="btn" />
+    </form>
+    <a href="{{ url_for("homepage") }}">return</a>
+{% endblock %}

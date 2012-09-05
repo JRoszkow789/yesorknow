@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Yes or Know Home{% endblock %}
+{% block header %}Yes or Know?{% endblock %}
+{% block content %}
+    <a href="{{ url_for('homepage') }}">
+        <h1 class="logo">Yes or Know?</h1></a>
+    {% for question in questions %}
+        <div class="well">
+            <p class="lead">Published: {{ question.asked }} ago</p>
+            <h3 class="center">{{ question.category }}</h3>
+            <p>{{ question.text }}</p>
+        </div>
+    {% else %}
+        <h2>What?! No questions yet?! Add some!!</h2>
+    {% endfor %}
+{% endblock %}
