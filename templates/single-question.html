@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="logo">Question {{ question.question_id }}</h1>
+<div class="span6 offset3 well">
+    <h3>category: {{ question.category }}</h3>
+    <p class="lead">{{ question.text }}</p>    
+    <form method="POST" action="{{ url_for('question_permapage', 
+    question_id=question.question_id) }}">
+        <button class="btn" value="0" name="choice" type="submit">no</button>
+        <button class="btn" value="1" name="choice" type="submit">yes</button>
+    </form>
+</div>
+<h2 class="center">Results</h2>
+<div class="span4 offset1 well"><h3>No: {{ answers[0] }}</h3></div>
+<div class="span4 offset2 well"><h3>Yes: {{ answers[1] }}</h3></div>
+{% endblock %}

@@ -18,5 +18,5 @@ class AddQuestionForm(Form):
     question_text = TextAreaField('Your question here...', [Required()])
 
 class AnswerQuestionForm(Form):
-    choice = RadioField('Answer', [Required()], choices=['No', 'Yes'])
+    choice = RadioField('choice', [Required()], choices=[(0, 'no'), (1, 'yes')])
 

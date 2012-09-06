@@ -113,6 +113,19 @@ def get_answer(answer_id):
                     [answer_id], one=True)
 
 
+def get_answer_count(question_id):
+    ans = query_db('''select * from answers where question_id = ?''', 
+        [question_id])
+    y_count = 0
+    n_count = 0
+    for a in ans:
+        if a['answer_choice'] == 1:
+            y_count += 1
+        else:
+            n_count += 1
+    return (n_count, y_count)
+
+
 def format_datetime(dt):
     '''Format a raw datetime for display.'''
     return datetime.strftime('%Y-%m-%d @ %H:%M')
@@ -166,6 +179,13 @@ def teardown_request(exception):
     g.db.close()
 
 
+###############################
+##                   
+##     Url Routing 
+##
+##############################
+
+
 @app.route('/')
 def homepage():
     '''Returns the applications homepage.'''
@@ -173,6 +193,27 @@ def homepage():
            questions=[format_question(q) for q in query_db('''
            select * from questions order by pub_date desc''')], user=g.user)
 
+
+@requires_login
+@app.route('/question/<int:question_id>', methods=['GET', 'POST'])
+def question_permapage(question_id):
+    q = get_question(question_id=question_id)
+    if q is None: 
+        flash("Sorry, we couldn't find that question.")
+        return redirect(url_for('homepage'))
+    ans = get_answer_count(question_id)
+    if request.method == 'POST':
+        g.db.execute('''insert into answers (answer_choice, question_id, 
+                        pub_date, last_modified, user_id) values (
+                        ?, ?, ?, ?, ?)''', [request.form['choice'], 
+                        q['question_id'], 
+                        datetime.utcnow(), datetime.utcnow(), 
+                        g.user['user_id']])
+        g.db.commit()
+        flash('great! your answer was recorded')
+        return redirect(url_for('homepage'))
+    return render_template('single-question.html', answers=ans, 
+                                                  question=format_question(q))
 
 @requires_login
 @app.route('/question/add', methods=['GET', 'POST'])
