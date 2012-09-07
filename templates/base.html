@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>{% block title %}Yes or Know?{% endblock %}</title>
+	<title>{% block title %}noSi{% endblock %}</title>
 	<link rel="stylesheet" type="text/css"\
 		  href="{{ url_for('static', filename='style.css') }}" />
 	<link rel="stylesheet" type="text/css" \
@@ -11,22 +11,32 @@
 <body>
 <div class="container">
 <div class="row">
-	<div class="span 4 offset8 righty">
-		<h4 >
+    <div class="span8 offset1">
+    <ul class="unstyled">
+    {% for msg in get_flashed_messages() %}
+        <li><h4 class="min-margin">{{ msg }} | </h4></li>
+    {% else %}
+        <li><h4 class="min-margin">dont YOU want to know?</h4></li>
+    {% endfor %}
+    </ul>
+    </div>
+
+	<div class="span 3">
 		{% if not session.user_id %}
-			<a href="{{ url_for('login') }}">Log in</a>
+			<a class="user-login" href="{{ url_for('login') }}">
+                <h4 class="min-margin">login</h4></a>
 		{% else %}
-			<a href="{{ url_for('logout') }}">Logout</a>
+			<a class="user-login" href="{{ url_for('logout') }}">
+                <h4 class="min-margin">logout</h4></a>
 		{% endif %}
-		</h4>
 	</div>
 </div>
 
 <!-- Header area. -->
-<div class="row page-header">
-	<div class="span8 offset2">
+<div class="row page-header my-header">
+	<div class="span6 offset1">
         <a href="{{ url_for('homepage') }}">
-            <h1 class="logo">{{ header }}</h1>
+            <h1 class="logo">noSi</h1>
         </a>
     </div>
 </div>
@@ -42,18 +52,31 @@
 </div>
 
 <!-- Main Body/Content area. -->
-{% block content %}{% endblock %}
+<div class="row">
+    {% block content %}Content area{% endblock %}
+</div>
 
 <!-- Footer Area -->
 <div class="row">
-	<div class="span6 offset3 navbar center">
-		<ul class="nav">
-			<li><a href="#">Footer</a></li>
-			<li><a href="#">Links</a></li>
-			<li><a href="#">Area</a></li>
-		</ul>
-	</div>
+<div class="span6 offset3">
+<div class="navbar">
+    <div class="navbar-inner">
+        <a class="brand" href="{{ url_for('homepage') }}">noSi</a>
+        <ul class="nav">
+            <li class="active"><a href="#">sign up!</a></li>
+            <li><a href="#">ask a question</a></li>
+            <li><a href="#">feelin noSi?</a></li>
+            <li><a href="#">help</a></li>
+        </ul>
+    </div>
 </div>
 </div>
+</div>
+<!-- End Container -->
+</div>
+
+<!-- Load scripts at the end for faster page rendering. -->
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </body>
 </html>

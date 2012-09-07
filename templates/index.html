@@ -1,16 +1,87 @@
 {% extends "base.html" %}
 {% block title %}Yes or Know Home{% endblock %}
-{% block header %}Yes or Know?{% endblock %}
 {% block content %}
-    <a href="{{ url_for('homepage') }}">
-        <h1 class="logo">Yes or Know?</h1></a>
-    {% for question in questions %}
-        <div class="well">
-            <p class="lead">Published: {{ question.asked }} ago</p>
-            <h3 class="center">{{ question.category }}</h3>
-            <p>{{ question.text }}</p>
-        </div>
-    {% else %}
-        <h2>What?! No questions yet?! Add some!!</h2>
-    {% endfor %}
+<!-- Individual page's header -->
+<div class="row">
+    <div class="span6 offset3">
+        <h2 class="center">Welcome to noSi!</h2>
+        <h3 class="center">
+            <a href="{{ url_for('homepage') }}">
+                want to learn how it works? click here!</a></h3>
+    </div>
+</div>
+
+<!-- Page body pre-header. -->
+<div class="row">
+    <div class="span4 offset2">
+        <h3>recently asked</h3>
+    </div>
+</div>
+
+<!-- Page main body area. Holds recent question list. -->
+<div class="row">
+    <div class="span8 offset2 well">
+        {% for q in questions %}
+            <div class="row">
+                <!-- Individual question header area. -->
+                <div class="span3"><h4>asked {{ q.asked }} ago...</h4></div>
+                <div class="span3 offset2 text-right">
+                    <h5>category</h5><h4>{{ q.category }}</h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Main text area for question body. -->
+                <div class="span6 offset1">
+                    <p class="lead">{{ q.text }}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Question footer area. Contains most info, and the form -->
+                <div class="span3 offset1">
+                    <h4>asked by {{ q.author }}</h4>
+                </div>
+                <div class="span4">
+                    <button class="btn btn-danger" value="no...">no...</button>
+                    <button class="btn btn-success" value="yes!">yes!</button>
+                    <button class="btn btn-info"value="more...">more...</button>
+                </div>                    
+            </div>
+            <hr />   
+        {% else %}
+            <!-- Currently no questions, post a standard response. -->
+            <div class="row">
+                <!-- Individual question header area. -->
+                <div class="span3"><h4>asked 1 minute ago...</h4></div>
+                <div class="span2 offset1 text-right"><h5>category</h5></div>
+                <div class="span2 text-left"><h4>general</h4></div>
+            </div>
+
+            <div class="row">
+                <!-- Main text area for question body. -->
+                <div class="span6 offset1">
+                    <p class="lead">So apparently there is no questions posted
+                        here. If you ask me, this is just a ridiculous thing
+                        to hear. After all of my hard work if I cant get a 
+                        single question to be posted I dont know what I will 
+                        do.. Will you help me? Will you post the first 
+                        question??</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Question footer area. Contains most info, and the form -->
+                <div class="span3 offset1">
+                    <h4>asked by noSiJoe</h4>
+                </div>
+                <div class="span4">
+                    <button class="btn btn-danger" value="no...">no...</button>
+                    <button class="btn btn-success" value="yes!">yes!</button>
+                    <button class="btn btn-info"value="more...">more...</button>
+                </div>                    
+            </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

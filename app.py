@@ -193,6 +193,10 @@ def homepage():
            questions=[format_question(q) for q in query_db('''
            select * from questions order by pub_date desc''')], user=g.user)
 
+@app.route('/test')
+def test():
+    return render_template('register-main.html')
+
 
 @requires_login
 @app.route('/question/<int:question_id>', methods=['GET', 'POST'])

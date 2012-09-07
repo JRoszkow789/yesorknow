@@ -1,39 +1,52 @@
 .logo {
-	font-size: 54px;
-	line-height: 60px;
+	font-size: 72px;
+	line-height: 78px;
+}
+
+.my-header {
+    padding: 4px;
+    margin-bottom: 3px;
+}
+
+.meta-header {
+    
+}
+
+.min-margin {
+    margin-bottom: 4px;
+    padding-bottom: 0;
+}
+
+.text-center {
 	text-align: center;
 }
 
-.q-container {
-	padding-top: 24px;
-	padding-bottom: 12px;
-	text-align: center;
+.text-left {
+    text-align: left;
 }
 
-.video-intro {
-	height: 300px;
+.text-right {
+    text-align: right;
 }
 
-.center {
-	text-align: center;
+.float-right {
+    float: right;
 }
 
-.righty {
-	float: right;
+.float-left {
+    float: left;
 }
 
-.yntooltip {
-	margin-bottom: 12px;
+.auto-centered {
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.inline-link {
-	display: inline;
+.add-question-text {
+    font-size: 16px;
 }
 
-.yess {
-	color: green;
-}
-
-.noss {
-	color: red;
+.add-question-text textarea {
+    rows: 7;
+    cols: 80;
 }

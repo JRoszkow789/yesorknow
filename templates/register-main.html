@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Welcome to the family{% endblock %}
+{% block content %}
+<div class="row">
+    <!-- Page header -->
+    <div class="span6 offset3">
+        <h2 class="text-center min-margin">Come on in!</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="span6 offset3">
+        <h3 class="center">here, being <strong>nosi</strong> is a good thing!
+            </h3>
+    </div>
+</div>
+
+<div class="row">
+    <!-- User registration start - email field -->
+    <div class="span6 offset2 well">
+        <div class="row">
+            <div class="span4"><h3>Welcome to nosi!</h3></div>
+        </div>
+
+        <div class="row">
+            <div class="span5 offset1">
+                <p class="lead">In just a few seconds you will be a part 
+                    of the newest and fastest growing question and answer site 
+                    in the world.</p>
+                <p>To get started, enter an email address to login with. This 
+                    also lets us know your not a robot! Dont worry, your 
+                    information is safe with us, and we wont solicit or 
+                    sell your email address to anyone.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="span4 offset1">
+                <form>
+                    <dl>
+                        <dt>Email Address:
+                        <dd><input type="text" value="your email here..." />
+                    </dl>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="span6 offset4 well">
+        <div class="row">
+            <div class="span4"><h3>Your First Question</h3></div>
+        </div>
+        
+        <div class="row">
+            <div class="span5 offset1">
+                <p class="lead">This is a sample question to show you how 
+                    easy nosi is to use. Read the question carefully, then
+                    indicate your answer by simply clicking on the 
+                    corresponding <strong>yes</strong> or 
+                    <strong>no</strong>button. Try it out!</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="span5 offset1">
+                <h3>Is the email address you provided above a valid email 
+                    address that belongs to you?</h3>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="span4 offset1">
+                <button class="btn btn-danger" value="no">
+                    no</button>
+                <button class="btn btn-success" value="yes!">yes!</button>   
+            </div>
+        </div>
+    </div>
+</div>       
+{% endblock %}
