@@ -63,10 +63,11 @@
     <div class="navbar-inner">
         <a class="brand" href="{{ url_for('homepage') }}">noSi</a>
         <ul class="nav">
-            <li class="active"><a href="#">sign up!</a></li>
-            <li><a href="#">ask a question</a></li>
-            <li><a href="#">feelin noSi?</a></li>
-            <li><a href="#">help</a></li>
+            <li class="active">
+                <a href="{{ url_for('registration') }}">sign up!</a></li>
+            <li><a href="{{ url_for('add_question') }}">ask a question</a></li>
+            <li><a href="{{ url_for('categories_main') }}">feelin noSi?</a></li>
+            <li><a href="{{ url_for('homepage') }}">help</a></li>
         </ul>
     </div>
 </div>

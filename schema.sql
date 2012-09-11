@@ -16,7 +16,8 @@ DROP TABLE IF EXISTS categories;
 CREATE TABLE categories (
 	category_id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	category_name STRING NOT NULL, 
-	pub_date TIMESTAMP NOT NULL, 
+	category_desc STRING,  
+    pub_date TIMESTAMP NOT NULL, 
 	last_modified TIMESTAMP NOT NULL,
     user_id INTEGER NOT NULL, 
 	FOREIGN KEY(user_id) REFERENCES users(user_id)	

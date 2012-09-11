@@ -73,9 +73,8 @@ def get_category(categoryname=None, category_id=None):
                            where category_name = ?''', [categoryname],one=True)
     elif category_id is not None:
         return query_db('''select category_id, category_name from categories 
-                           where category_id = ?''', [category_id], one=True) 
-    else:
-        return None
+                           where category_id = ?''', [category_id], one=True)
+    return None
 
 def categories_list():
     return [(c['category_id'], c['category_name']) for c in query_db('''
@@ -193,10 +192,6 @@ def homepage():
            questions=[format_question(q) for q in query_db('''
            select * from questions order by pub_date desc''')], user=g.user)
 
-@app.route('/test')
-def test():
-    return render_template('register-main.html')
-
 
 @requires_login
 @app.route('/question/<int:question_id>', methods=['GET', 'POST'])
@@ -239,8 +234,8 @@ def add_question():
 
 
 @requires_login
-@app.route('/category/add', methods=['GET', 'POST'])
-def add_category():
+@app.route('/categories', methods=['GET', 'POST'])
+def categories_main():
     form = AddCategoryForm(request.form)
     if form.validate_on_submit():
         g.db.execute('''insert into categories (category_name, pub_date, 
@@ -250,7 +245,7 @@ def add_category():
         g.db.commit()
         flash('Your category has been submitted for review')
         return redirect(url_for('homepage'))
-    return render_template('add-category.html', form=form)
+    return render_template('categories.html', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -276,7 +271,7 @@ def registration():
                             ?, ?, ?, ?, ?, ?, ?)''' [
                             form.username.data, 
                             generate_password_hash(form.password.data), 
-                            1, 0, (False if form.gender.date == 'f' 
+                            1, 0, (False if form.gender.data == 'f' 
                             else True), datetime.utcnow(), datetime.utcnow()])
         g.db.commit()
         flash('thanks for registering, you may login now')

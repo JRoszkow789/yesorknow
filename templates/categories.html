@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block header %}Add category{% endblock %}
+{% block content %}
+<div class="row">
+    <!-- Page header -->
+    <div class="span6 offset3 text-center"><h1>categories</h1></div>
+</div>
+
+<div class="row">
+<!-- Main body area -->
+<div class="span8 offset2 well">
+    <div class="row">
+        <!-- Categories list -->
+        <div class="span6 offset1">
+            <h4>this is a list of all the nosi question categories</h4>
+            <h4>click on the category you're interested in to see related 
+                questions</h4> 
+            <dl>
+                <dt>General
+                <dd>for questions asking general information
+                <dt>Have you ever?
+                <dd>questions of the format "have you ever...?"
+                <dt>noSi
+                <dd>questions related to nosi and this website
+                <dt>Canopy Innovation
+                <dd>questions regarding nosi parent company, Canopy Innovation
+            </dl>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Add your own category -->
+        {% from "macros.html" import render_field %}
+        <div class="span4 offset2">
+            <form method="POST" action="{{ url_for('categories_main') }}">
+                {{ form.csrf_token }}
+                {{ render_field(form.categoryname) }}
+                <input type="submit" value="submit category" class="btn" />
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

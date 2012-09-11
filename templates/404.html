@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="span6 offset3 well">
+        <h2>Oops!</h2>
+        <p class="lead">We're sorry, but the page you requested isn't here!
+            we have already been notified and will be working on it now, 
+            sorry about that!</p>
+
+        <p class="lead">
+            <a href="{{ url_for('homepage') }}">return to nosi home</a></p>
+        <p class="lead">
+            <a href="url_for('contact') }}">tell us about it</a></p>
+    </div>
+</div>
+{% endblock %}
