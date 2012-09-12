@@ -4,7 +4,8 @@
 <div class="span8 offset2 well">
     <div class="row">
         <!-- Question meta-area -->
-        <div class="span3 offset1"><h3>427 Answers!</h3></div>
+        <div class="span3 offset1">
+            <h3>{{ answers[0] + answers[1] }} answers!</h3></div>
         <div class="span3 text-right">
             <h3>category: {{ question.question_category }}</h3>
         </div>
@@ -24,21 +25,12 @@
 
     <div class="row">
         <!-- Question footer area. Contains answer and information area. -->
-        <div class="span4 offset1"><h3>Add Your answer!</h3></div>
+        <div class="span4 offset1"><h3>the results!</h3></div>
     </div>
 
     <div class="row">
-    <form method="POST" action="{{ url_for('question_permapage', 
-                                    question_id=question.question_id) }}">
-        <div class="span2 offset2 float-centered">
-            <input type="submit" class="btn btn-large btn-danger" 
-                name="user_response" value="no" />
-        </div>
-        <div class="span2 float-centered">
-            <input type="submit" class="btn btn-large btn-danger"
-                name="user_response" value="yes" />
-        </div>
-    </form>
+        <div class="span4 text-center"><h3>no: {{ answers[0] }}</h3></div>
+        <div class="span4 text-center"><h3>yes: {{ answers[1] }}</h3></div>
     </div>
 </div>
 </div>

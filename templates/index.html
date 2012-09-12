@@ -44,10 +44,21 @@
                     <h4>asked by {{ q.question_user.user_name }}</h4>
                 </div>
                 <div class="span4">
-                    <button class="btn btn-danger" value="no...">no...</button>
-                    <button class="btn btn-success" value="yes!">yes!</button>
-                    <button class="btn btn-info"value="more...">more...</button>
+                <form method="POST" action="{{ url_for('question_permapage', 
+                                               question_id=q.question_id) }}">
+                    <input type="submit" class="btn btn-danger" 
+                            name="user_response" value="no" /> 
+                    <input type="submit" class="btn btn-danger" 
+                            name="user_response" value="yes" />
                 </div>                    
+            </div>
+
+            <div class="row">
+                <div class="span2 offset6">
+                    <input type="submit" class="btn btn-small btn-primary" 
+                            name="user_response" value="more info..." />
+                </form>
+                </div>
             </div>
             <hr />   
         {% else %}

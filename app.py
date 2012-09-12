@@ -14,7 +14,7 @@ import constants as CTS
 
 # Configuration
 DATABASE = '/tmp/yn.db'
-DEBUG = True
+DEBUG = False 
 SECRET_KEY = 'dev key yo'
 USERNAME = 'admin'
 PASSWORD = 'default'
@@ -78,7 +78,7 @@ def get_question_by_id(question_id):
     '''Simple helper method to retrieve a question object from the 
        database provided a question_id. 
     '''
-    return query_db('''select * questions where question_id = ?''', 
+    return query_db('''select * from questions where question_id = ?''', 
                     [question_id], one=True)
 
 
@@ -224,10 +224,10 @@ def question_permapage(question_id):
     if q is None: 
         flash("Sorry, we couldn't find that question.")
         return redirect(url_for('homepage'))
-    user_response = ANSWER.NO if request.form['no'] else ANSWER.YES
-    form = AnswerQuestionForm(request.form)
-    ans = formatted_answer_count(question_id)
-    if request.method == 'POST':
+    if (request.method == 'POST') and (
+            request.form['user_response'] != 'more info...'):
+        user_response = (CTS.NO if request.form['user_response'] == 'no' 
+                                else CTS.YES)
         g.db.execute('''insert into answers (answer_choice, question_id, 
                         pub_date, last_modified, user_id) values (
                         ?, ?, ?, ?, ?)''', [user_response, q['question_id'], 
@@ -235,11 +235,20 @@ def question_permapage(question_id):
                         g.user['user_id']])
         g.db.commit()
         flash('great! your answer was recorded')
-        return redirect(url_for('homepage'))
+        return redirect(url_for('show_results', question_id=question_id))
     return render_template('single-question.html', 
-                                      form=form, 
-                                      answers=ans, 
-                                      question=formatted_question(question=q))
+                            question=formatted_question(question=q))
+
+
+@app.route('/question/<int:question_id>/results')
+def show_results(question_id):
+    q = formatted_question(question_id=question_id)
+    if q is None:
+        flash('sorry that question was not found')
+        return redirect(url_for('homepage'))
+    ans_counts = formatted_answer_count(question_id)
+    return render_template('question-results.html', question=q, 
+                                                     answers=ans_counts)
 
 
 @requires_login
