@@ -313,24 +313,27 @@ def registration():
                             CTS.PENDING, 
                             datetime.utcnow(), datetime.utcnow()])
             g.db.commit()
+#TODO this has to be terrible for memory!
+            session['temp_id'] = get_user(
+                                   user_email=form.user_email.data)['user_id']
             flash('almost there!')
-            return redirect(url_for('registration_continued', 
-                                    user_id=get_user_id(
-                                      user_email=form.user_email.data)))
+            return redirect(url_for('registration_continued')) 
     return render_template('register-main.html', form=form)
 
 
-@app.route('/almostthere<user_id>', methods=['GET', 'POST'])
-def registration_continued(user_id):
+@app.route('/almostthere', methods=['GET', 'POST'])
+def registration_continued():
     form = RegisterFormContinued(request.form)
-    if form.validate_on_submit():
+    if form.validate_on_submit() and 'temp_id' in session:
         g.db.execute('''update users set user_name = ?, user_pw_hash = ? 
-                        where user_id = 1''', [form.user_name.data, 
-                        generate_password_hash(form.user_pw.data)])
+                        where user_id = ?''', (form.user_name.data, 
+                        generate_password_hash(form.user_pw.data), 
+                        int(session['temp_id'])))
         g.db.commit()
+        session.pop('temp_id', None)
         flash('congratulations you have been registered! you may login now')
         return redirect(url_for('login'))
-    return render_template('register2.html', form=form, user_id=user_id)
+    return render_template('register2.html', form=form)
     
          
 @app.route('/login', methods=['GET', 'POST'])
