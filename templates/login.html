@@ -6,8 +6,8 @@
     {% from "macros.html" import render_field %}
         <form method="POST" action="{{ url_for('login') }}">
             {{ form.csrf_token }}
-            {{ render_field(form.username) }}
-            {{ render_field(form.password) }}
+            {{ render_field(form.user_email) }}
+            {{ render_field(form.user_pw) }}
             <input type="submit" class="btn" value="login" />
         </form>   
         <a href="{{ url_for('registration') }}">register</a>

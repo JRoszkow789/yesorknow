@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Almost there!{% endblock %}
+{% block content %}
+<div class="row">
+    <!-- Page header -->
+    <div class="span6 offset3">
+        <h2 class="text-center min-margin">Almost there!</h2>
+    </div>
+</div>
+
+<div class="row">
+    <!-- User secondary registration start - password field -->
+    <div class="span6 offset2 well">
+        <div class="row">
+            <div class="span4"><h3>Just one more click!</h3></div>
+        </div>
+
+        <div class="row">
+            <div class="span5 offset1">
+                <p class="lead">Congratulations you answered your first 
+                    question!</p>
+                <p class="lead">The last thing to do is tell us what you would 
+                    like your name to be displayed as, and set a password 
+                    for you to use when you come back to nosi!</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="span4 offset1">
+                {% from "macros.html" import render_field %}
+                <form method="POST" action="{{ 
+                    url_for('registration_continued', user_id=user_id) }}">
+                    {{ form.csrf_token }}
+                    {{ render_field(form.user_name) }}
+                    {{ render_field(form.user_pw) }}
+                    {{ render_field(form.user_verify) }}
+                    <input type="submit" class="btn btn-large btn-danger" value="let's get nosi!" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

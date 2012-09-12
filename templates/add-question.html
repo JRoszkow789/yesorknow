@@ -44,9 +44,9 @@
             <!-- Add question submit or no area. -->
             <div class="span3 offset1"><h3>ready to ask?</h3></div>
             <div class="span3">
-                <button type="submit" class="btn btn-danger" value="no">
+                <button type="submit" class="btn btn-large btn-danger" value="no">
                     not yet..</button>
-                <button type="submit" class="btn btn-success" value="yes">
+                <button type="submit" class="btn btn-large btn-danger" value="yes">
                     yes, ask!</button>
             </div>
         </div>
@@ -57,10 +57,12 @@
                     <div class="navbar-inner">
                         <ul class="nav">
                             <li>
-                                <a href="{{ url_for('homepage') }}">nevermind
-                                </a></li>
-                            <li><a href="#">preview</a></li>
-                            <li><a href="#">help</a></li>
+                                <a href="{{ url_for('homepage') }}">
+                                nevermind</a></li>
+                            <li><a href="{{ url_for('add_question') }}">
+                                start over</a></li>
+                            <li><a href="{{ url_for('about_info') }}">
+                                help</a></li>
                         </ul>
                     </div>
                 </div>

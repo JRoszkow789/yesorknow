@@ -1,11 +1,12 @@
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
 	user_id INTEGER PRIMARY KEY AUTOINCREMENT, 
-	user_name STRING NOT NULL, 
-	user_pw_hash STRING NOT NULL,
-	user_role INTEGER NOT NULL, 
-	user_status INTEGER NOT NULL, 
-	user_gender BOOLEAN NOT NULL, 
+    user_email STRING NOT NULL, 
+    user_gender INTEGER NOT NULL,
+    user_status INTEGER NOT NULL,   
+	user_pw_hash STRING,
+	user_role INTEGER, 
+    user_name STRING, 
 	user_zipcode INTEGER, 
 	user_age INTEGER, 
 	user_join_date TIMESTAMP NOT NULL, 
@@ -38,7 +39,7 @@ CREATE TABLE questions (
 DROP TABLE IF EXISTS answers;
 CREATE TABLE answers (
 	answer_id INTEGER PRIMARY KEY AUTOINCREMENT, 
-	answer_choice BOOLEAN NOT NULL,
+	answer_choice INTEGER NOT NULL,
 	question_id INTEGER NOT NULL,
 	pub_date TIMESTAMP NOT NULL, 
 	last_modified TIMESTAMP NOT NULL,

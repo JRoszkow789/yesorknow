@@ -1,22 +1,27 @@
 from flask.ext.wtf import Form, TextField, PasswordField, TextAreaField
-from flask.ext.wtf import RadioField, SelectField, Required, EqualTo
+from flask.ext.wtf import SelectField, Required, Email, EqualTo, SubmitField
+
 
 class LoginForm(Form):
-    username = TextField('Username', [Required()])
-    password = PasswordField('Password', [Required()])
+    user_email = TextField('email address', [Required(), Email()])
+    user_pw = PasswordField('password', [Required()])
+
 
 class RegisterForm(Form):
-    username = TextField('Desired Username', [Required()])
-    password = PasswordField('Password', [Required()])
-    gender = RadioField('Gender', [Required()], choices=[('m', 'Male'), 
-                                                       ('f', 'Female')])
+    user_email = TextField('email address', [Required(), Email()])
+
+
+class RegisterFormContinued(Form):
+    user_name = TextField('desired username', [Required()])
+    user_pw = PasswordField('password', [Required()])
+    user_verify = PasswordField('verify password', [
+                                Required(), EqualTo('user_pw')])
+
 
 class AddCategoryForm(Form):
-    categoryname = TextField('Proposed Category', [Required()])
+    category_name = TextField('proposed category', [Required()])
+
 
 class AddQuestionForm(Form):    
     question_text = TextAreaField('Your question here...', [Required()])
-
-class AnswerQuestionForm(Form):
-    choice = RadioField('choice', [Required()], choices=[(0, 'no'), (1, 'yes')])
 

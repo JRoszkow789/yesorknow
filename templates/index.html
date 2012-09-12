@@ -24,23 +24,24 @@
         {% for q in questions %}
             <div class="row">
                 <!-- Individual question header area. -->
-                <div class="span3"><h4>asked {{ q.asked }} ago...</h4></div>
+                <div class="span3">
+                    <h4>asked {{ q.question_timelapse }} ago...</h4></div>
                 <div class="span3 offset2 text-right">
-                    <h5>category</h5><h4>{{ q.category }}</h4>
+                    <h5>category</h5><h4>{{ q.question_category }}</h4>
                 </div>
             </div>
 
             <div class="row">
                 <!-- Main text area for question body. -->
                 <div class="span6 offset1">
-                    <p class="lead">{{ q.text }}</p>
+                    <p class="lead">{{ q.question_text }}</p>
                 </div>
             </div>
 
             <div class="row">
                 <!-- Question footer area. Contains most info, and the form -->
                 <div class="span3 offset1">
-                    <h4>asked by {{ q.author }}</h4>
+                    <h4>asked by {{ q.question_user.user_name }}</h4>
                 </div>
                 <div class="span4">
                     <button class="btn btn-danger" value="no...">no...</button>

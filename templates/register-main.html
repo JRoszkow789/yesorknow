@@ -36,12 +36,10 @@
         
         <div class="row">
             <div class="span4 offset1">
-                <form>
-                    <dl>
-                        <dt>Email Address:
-                        <dd><input type="text" value="your email here..." />
-                    </dl>
-                </form>
+                {% from "macros.html" import render_field %}
+                <form method="POST" action = {{ url_for('registration') }}>
+                    {{ form.csrf_token }}
+                    {{ render_field(form.user_email) }}
             </div>
         </div>
     </div>
@@ -56,26 +54,31 @@
         <div class="row">
             <div class="span5 offset1">
                 <p class="lead">This is a sample question to show you how 
-                    easy nosi is to use. Read the question carefully, then
-                    indicate your answer by simply clicking on the 
-                    corresponding <strong>yes</strong> or 
-                    <strong>no</strong>button. Try it out!</p>
+                    some questions on nosi are phrased.  Due to every 
+                    response being a variation of 'Yes' or 'No', some 
+                    questions may be oriented at one particular user group or 
+                    scenario in order to get an accurate response in a yes or 
+                    no format.  Try it out! Read the following question 
+                    carefully, then  indicate your answer by simply clicking 
+                    on the corresponding <strong>yes</strong> or 
+                    <strong>no</strong>button. </p>
             </div>
         </div>
         
         <div class="row">
             <div class="span5 offset1">
-                <h3>Is the email address you provided above a valid email 
-                    address that belongs to you?</h3>
+                <h3>Are you a female?</h3>
             </div>
         </div>
         
         <div class="row">
-            <div class="span4 offset1">
-                <button class="btn btn-danger" value="no">
-                    no</button>
-                <button class="btn btn-success" value="yes!">yes!</button>   
+            <div class="span2 offset1">
+                <input type="submit" class="btn btn-large btn-danger" name="gender_btn" value="no" />
             </div>
+            <div class="span2">
+                <input type="submit" class="btn btn-large btn-danger" name="gender_btn" value="yes" />
+            </div>
+        </form>
         </div>
     </div>
 </div>       

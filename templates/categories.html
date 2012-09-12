@@ -34,7 +34,7 @@
         <div class="span4 offset2">
             <form method="POST" action="{{ url_for('categories_main') }}">
                 {{ form.csrf_token }}
-                {{ render_field(form.categoryname) }}
+                {{ render_field(form.category_name) }}
                 <input type="submit" value="submit category" class="btn" />
             </form>
         </div>
