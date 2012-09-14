@@ -16,14 +16,18 @@
             <h4>click on the category you're interested in to see related 
                 questions</h4> 
             <dl>
-                <dt>General
-                <dd>for questions asking general information
-                <dt>Have you ever?
-                <dd>questions of the format "have you ever...?"
-                <dt>noSi
-                <dd>questions related to nosi and this website
-                <dt>Canopy Innovation
-                <dd>questions regarding nosi parent company, Canopy Innovation
+            {% for category in categories %}
+                <dt>{{ category[1] }}
+                <dd><a href="{{ 
+                        url_for('random_question_page', 
+                        category=category[0]) }}">
+                        Check out a random question from the 
+                        {{ category[1] }} category!</a>
+            {% else %}
+                <dt><h3>What? No categories...</h3>
+                <dd>We're sorry, somehow no categories are showing up.
+                    Please, enter a new one below and lets get this right!
+            {% endfor %}
             </dl>
         </div>
     </div>

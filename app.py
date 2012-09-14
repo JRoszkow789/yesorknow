@@ -10,11 +10,11 @@ from werkzeug import check_password_hash, generate_password_hash
 from datetime import datetime, timedelta
 from flask_debugtoolbar import DebugToolbarExtension
 import constants as CTS
-
+from random import choice
 
 # Configuration
 DATABASE = '/tmp/yn.db'
-DEBUG = False 
+DEBUG = True 
 SECRET_KEY = 'dev key yo'
 USERNAME = 'admin'
 PASSWORD = 'default'
@@ -82,6 +82,34 @@ def get_question_by_id(question_id):
                     [question_id], one=True)
 
 
+def get_questions(question_id=None, category=None, count=None, random=False):
+    """Docstringin it yo"""
+    if question_id is not None: 
+        rv = query_db(
+                'select * from questions where question_id = ?', 
+                [question_id], one=True)
+        return rv
+
+    q_list = []
+    if category is not None and int(category) < 1000: #TODO this is a hack
+        q_list = (query_db(
+                'select * from questions where category_id = ?', 
+                [int(category)]))
+    elif category is not None:
+        q_list = query_db(
+                'select * from questions where category_id = ?', 
+                [get_category(category_name=category)['category_id']])
+    else:
+        q_list = query_db('select * from questions')
+    
+    if count is not None: 
+        return q_list[:count] if len(q_list) > count else q_list
+    elif random:
+        return choice(q_list)
+    
+    return q_list
+
+
 def get_answer(answer_id):
     '''Helper method for retrieving an answer object from the database given
        the answer_id.
@@ -131,9 +159,17 @@ def formatted_answer_count(question_id):
        by the count of yes answers for the question with the given parameter
        of question_id.
     '''
-    ans = query_db('''select answer_choice from answers where question_id = ?
+    #TODO Again gotta be murdering memory, especially on tiny ec2 instance!
+    answers = query_db('''select answer_choice from answers where question_id = ?
                    ''', [question_id])
-    return (ans.count(CTS.NO), ans.count(CTS.YES))
+    y_count = 0
+    n_count = 0
+    for a in answers:
+        if a['answer_choice'] == CTS.NO:
+            n_count += 1
+        else:
+            y_count += 1
+    return (n_count, y_count)
 
 
 def format_datetime(dt):
@@ -183,7 +219,11 @@ def before_request():
     g.db = connect_db()
     g.user = None
     if 'user_id' in session:
-        g.user = get_user(user_id=session['user_id'])
+        # Original 
+        #g.user = get_user(user_id=session['user_id'])
+        g.user = query_db(
+            'select user_id, user_name from users where user_id = ?', 
+            [session['user_id']], one=True)
 
 @app.teardown_request
 def teardown_request(exception):
@@ -271,6 +311,20 @@ def add_question():
                                      categories=formatted_category_tuples())
 
 
+@app.route('/random/<category>')
+@app.route('/random')
+def random_question_page(category=None):
+    """Returns a single random question for display. 
+       A category may be specified.
+    """
+    q = get_questions(category=category, random=True)
+    
+    # TODO this is also a dumb hack FIX IT!
+    return redirect(url_for(
+            'question_permapage', 
+            question_id=q['question_id']))
+
+
 @requires_login
 @app.route('/categories', methods=['GET', 'POST'])
 def categories_main():
@@ -283,7 +337,8 @@ def categories_main():
         g.db.commit()
         flash('Your category has been submitted for review')
         return redirect(url_for('homepage'))
-    return render_template('categories.html', form=form)
+    categories = formatted_category_tuples()
+    return render_template('categories.html', form=form, categories=categories)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -291,16 +346,12 @@ def registration():
     if g.user:
         flash('you are already logged in')
         return redirect(url_for('homepage'))
-    flash('reg')
     if request.method == 'POST':
         user_gender_response = (
             CTS.MALE if request.form['gender_btn'] == 'no' 
                             else CTS.FEMALE)
-        flash(user_gender_response)
     form = RegisterForm(request.form)
-    flash('regform')
     if form.validate_on_submit():
-        flash('regform val')
         if form.user_email.data == 'Joe@CanopyInnovation.com':
             g.db.execute('''insert into users (user_name, user_pw_hash, 
                             user_role, user_status, user_gender, user_email, 
@@ -325,7 +376,7 @@ def registration():
 #TODO this has to be terrible for memory!
             session['temp_id'] = get_user(
                                    user_email=form.user_email.data)['user_id']
-            flash('almost there!')
+            flash('Achievement: First Question!')
             return redirect(url_for('registration_continued')) 
     return render_template('register-main.html', form=form)
 
