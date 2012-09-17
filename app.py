@@ -51,6 +51,20 @@ def query_db(query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 
+
+def insert_db(table, fields=(), values=()):
+    # g.db is the database connection
+    cur = g.db.cursor()
+    query = 'INSERT INTO %s (%s) VALUES (%s)' % (
+            table, ', '.join(fields),
+            ', '.join(['?'] * len(values))
+            )
+    cur.execute(query, values)
+    g.db.commit()
+    id = cur.lastrowid
+    cur.close()
+    return id
+
 def get_user(user_name=None, user_id=None, user_email=None):
     '''Simple helper method to return a user object from the database.
        can retrieve user by supplying user_name, user_id, or user_email.
@@ -66,20 +80,11 @@ def get_user(user_name=None, user_id=None, user_email=None):
                            [user_email], one=True)
     return None
 
-
-def get_user_id(user_email=None):
-    if user_email is not None:
-        return query_db('''select user_id from users where user_email = ?
-                        ''', [user_email], one=True)
-    return None
-
-
-def get_question_by_id(question_id):
-    '''Simple helper method to retrieve a question object from the 
-       database provided a question_id. 
-    '''
-    return query_db('''select * from questions where question_id = ?''', 
-                    [question_id], one=True)
+def get_user_info(user_id):
+    user_info = query_db(
+            'select user_id, user_name from users where user_id = ?', 
+            [user_id], one=True)
+    return user_info
 
 
 def get_questions(question_id=None, category=None, count=None, random=False):
@@ -93,14 +98,15 @@ def get_questions(question_id=None, category=None, count=None, random=False):
     q_list = []
     if category is not None and int(category) < 1000: #TODO this is a hack
         q_list = (query_db(
-                'select * from questions where category_id = ?', 
-                [int(category)]))
+                'select * from questions where category_id = ? order by \
+                        pub_date desc', [int(category)]))
     elif category is not None:
         q_list = query_db(
-                'select * from questions where category_id = ?', 
-                [get_category(category_name=category)['category_id']])
+                'select * from questions where category_id = ? order by \
+                        pub_date desc', 
+                        [get_category(category_name=category)['category_id']])
     else:
-        q_list = query_db('select * from questions')
+        q_list = query_db('select * from questions order by pub_date desc')
     
     if count is not None: 
         return q_list[:count] if len(q_list) > count else q_list
@@ -108,14 +114,6 @@ def get_questions(question_id=None, category=None, count=None, random=False):
         return choice(q_list)
     
     return q_list
-
-
-def get_answer(answer_id):
-    '''Helper method for retrieving an answer object from the database given
-       the answer_id.
-    '''
-    return query_db('''select * from answers where answer_id = ?''',
-                    [answer_id], one=True)
 
 
 def get_category(category_name=None, category_id=None):
@@ -143,13 +141,13 @@ def formatted_question(question_id=None, question=None):
     if question is not None:
         q = question
     elif question_id is not None:
-        q = get_question_by_id(question_id)
+        q = get_questions(question_id=question_id)
     else: 
         return None
     return dict([('question_id', q['question_id']), 
                ('question_text', q['question_text']),
                ('question_timelapse', get_timelapse_string(q['pub_date'])),
-               ('question_user', get_user(user_id=q['user_id'])),
+               ('question_user', get_user_info(user_id=q['user_id'])),
                ('question_category', get_category(
                             category_id=q['category_id'])['category_name'])]) 
 
@@ -160,8 +158,9 @@ def formatted_answer_count(question_id):
        of question_id.
     '''
     #TODO Again gotta be murdering memory, especially on tiny ec2 instance!
-    answers = query_db('''select answer_choice from answers where question_id = ?
-                   ''', [question_id])
+    answers = query_db(
+            'select answer_choice from answers where question_id = ?' , 
+            [question_id])
     y_count = 0
     n_count = 0
     for a in answers:
@@ -172,19 +171,10 @@ def formatted_answer_count(question_id):
     return (n_count, y_count)
 
 
-def format_datetime(dt):
-    '''Format a raw datetime for display.'''
-    return datetime.strftime('%Y-%m-%d @ %H:%M')
-
-
-def datetime_from_string(s):
-    '''Returns a python datetime object ffrom the supplied string.'''
-    return datetime.strptime(s, '%Y-%m-%d %H:%M:%S.%f')
-
-
 def get_timelapse_string(dt):
     '''Returns a string for displaying how long since the supplied timelapse.'''
-    diff = (datetime.utcnow() - datetime_from_string(dt)).total_seconds()
+    diff = (datetime.utcnow() - 
+            datetime.strptime(dt, '%Y-%m-%d %H:%M:%S.%f')).total_seconds()
     if diff > (60*60*24):
         rs = '%d days' % (diff // (60*60*24))
         return rs[:-1] if rs.startswith('1') else rs
@@ -202,8 +192,9 @@ def check_password(user, pw_attempt):
     '''Verifies the entered password against the stored password hash for the 
        assumed user. Returns a boolean indicating success or not.
     '''
-    user_full = query_db('''select * from users where user_id = ?''', 
-                           [user['user_id']], one=True)
+    user_full = query_db(
+            'select user_pw_hash from users where user_id = ?',
+            [user['user_id']], one=True)
     return check_password_hash(user_full['user_pw_hash'], pw_attempt)
 
 
@@ -251,16 +242,16 @@ def not_found(error):
 @app.route('/')
 def homepage():
     '''Returns the applications homepage.'''
-    return render_template('index.html', questions=[formatted_question(
-                                          question=q) for q in query_db(
-                           '''select * from questions order by pub_date desc
-                           ''')], user=g.user)
+    return render_template(
+            'index.html', 
+            questions=[formatted_question(question=q) for q in get_questions()],
+            user=g.user)
 
 
-@requires_login
 @app.route('/question/<int:question_id>', methods=['GET', 'POST'])
+@requires_login
 def question_permapage(question_id):
-    q = get_question_by_id(question_id)
+    q = get_questions(question_id=question_id)
     if q is None: 
         flash("Sorry, we couldn't find that question.")
         return redirect(url_for('homepage'))
@@ -287,12 +278,13 @@ def show_results(question_id):
         flash('sorry that question was not found')
         return redirect(url_for('homepage'))
     ans_counts = formatted_answer_count(question_id)
-    return render_template('question-results.html', question=q, 
-                                                     answers=ans_counts)
+    return render_template(
+            'question-results.html', 
+            question=q, answers=ans_counts)
 
 
-@requires_login
 @app.route('/question/add', methods=['GET', 'POST'])
+@requires_login
 def add_question():
     if request.method == 'POST':
         category = request.form['category']
@@ -325,11 +317,13 @@ def random_question_page(category=None):
             question_id=q['question_id']))
 
 
-@requires_login
 @app.route('/categories', methods=['GET', 'POST'])
 def categories_main():
     form = AddCategoryForm(request.form)
     if form.validate_on_submit():
+        if g.user is None:
+            flash(u'you must be logged in for that!', 'warning')
+            return redirect(url_for('login', next=request.path))
         g.db.execute('''insert into categories (category_name, pub_date, 
                         last_modified, user_id) values (?, ?, ?, ?)''', [
                         form.category_name.data, datetime.utcnow(), 
@@ -366,16 +360,24 @@ def registration():
             flash('Super user Joe added, welcome sir...')
             return redirect(url_for('login'))
         else:
-            g.db.execute('''insert into users (user_email, user_gender, 
-                            user_status, user_join_date, last_modified) 
-                            values (?, ?, ?, ?, ?)''',  [
-                            form.user_email.data, user_gender_response, 
-                            CTS.PENDING, 
-                            datetime.utcnow(), datetime.utcnow()])
-            g.db.commit()
+            #g.db.execute('''insert into users (user_email, user_gender, 
+            #                user_status, user_join_date, last_modified) 
+            #                values (?, ?, ?, ?, ?)''',  [
+            #                form.user_email.data, user_gender_response, 
+            #                CTS.PENDING, 
+            #                datetime.utcnow(), datetime.utcnow()])
+            #g.db.commit()
 #TODO this has to be terrible for memory!
-            session['temp_id'] = get_user(
-                                   user_email=form.user_email.data)['user_id']
+            #session['temp_id'] = get_user(
+            #                       user_email=form.user_email.data)['user_id']
+            new_user_id = insert_db(table='users', fields=(
+                'user_email', 'user_gender',
+                'user_status', 'user_join_date',
+                'last_modified'), values=(
+                form.user_email.data, user_gender_response,
+                CTS.PENDING, datetime.utcnow(),
+                datetime.utcnow()))
+            session['temp_id'] = new_user_id
             flash('Achievement: First Question!')
             return redirect(url_for('registration_continued')) 
     return render_template('register-main.html', form=form)
@@ -406,7 +408,9 @@ def login():
         user_attempt = get_user(user_email=form.user_email.data)
         if user_attempt is None:
             error = 'Invalid email'
-        elif not check_password(user_attempt, form.user_pw.data):
+        elif not check_password_hash(
+                user_attempt['user_pw_hash'], 
+                form.user_pw.data):
             error = 'Invalid password'
         else:
             session['user_id'] = user_attempt['user_id']
