@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form, TextField, PasswordField, TextAreaField
-from flask.ext.wtf import SelectField, Required, Email, EqualTo, SubmitField
+from flask.ext.wtf import Required, Email, EqualTo
 
 
 class LoginForm(Form):

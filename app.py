@@ -188,16 +188,6 @@ def get_timelapse_string(dt):
     return rs[:-1] if diff == 1 else rs
         
     
-def check_password(user, pw_attempt):
-    '''Verifies the entered password against the stored password hash for the 
-       assumed user. Returns a boolean indicating success or not.
-    '''
-    user_full = query_db(
-            'select user_pw_hash from users where user_id = ?',
-            [user['user_id']], one=True)
-    return check_password_hash(user_full['user_pw_hash'], pw_attempt)
-
-
 @app.before_request
 def before_request():
     '''Makes sure we have a live connection to the app's database before 
