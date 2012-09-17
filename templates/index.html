@@ -26,7 +26,7 @@
             <div class="row">
                 <!-- Individual question header area. -->
                 <div class="span3">
-                    <h4>asked {{ q.question_timelapse }} ago...</h4></div>
+                    <h4>asked {{ q.pub_date|time_since }}</h4></div>
                 <div class="span3 offset2 text-right">
                     <h5>category</h5><h4>{{ q.question_category }}</h4>
                 </div>

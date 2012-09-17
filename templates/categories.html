@@ -16,13 +16,13 @@
             <h4>click on the category you're interested in to see related 
                 questions</h4> 
             <dl>
-            {% for category in categories %}
-                <dt>{{ category[1] }}
+            {% for cat in categories %}
+                <dt>{{ cat.category_name }}
                 <dd><a href="{{ 
                         url_for('random_question_page', 
-                        category=category[0]) }}">
+                        category=cat.category_id) }}">
                         Check out a random question from the 
-                        {{ category[1] }} category!</a>
+                        {{ cat.category_name }} category!</a>
             {% else %}
                 <dt><h3>What? No categories...</h3>
                 <dd>We're sorry, somehow no categories are showing up.

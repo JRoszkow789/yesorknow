@@ -51,9 +51,7 @@ def query_db(query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 
-
 def insert_db(table, fields=(), values=()):
-    # g.db is the database connection
     cur = g.db.cursor()
     query = 'INSERT INTO %s (%s) VALUES (%s)' % (
             table, ', '.join(fields),
@@ -64,6 +62,7 @@ def insert_db(table, fields=(), values=()):
     id = cur.lastrowid
     cur.close()
     return id
+
 
 def get_user(user_name=None, user_id=None, user_email=None):
     '''Simple helper method to return a user object from the database.
@@ -79,6 +78,7 @@ def get_user(user_name=None, user_id=None, user_email=None):
         return query_db('''select * from users where user_email = ?''', 
                            [user_email], one=True)
     return None
+
 
 def get_user_info(user_id):
     user_info = query_db(
@@ -129,14 +129,6 @@ def get_category(category_name=None, category_id=None):
     return None
 
 
-def formatted_category_tuples():
-    '''Returns a list of tuples in the format 
-       '(category_id, category_name)' for all categories in the database.
-    '''
-    return [(c['category_id'], c['category_name']) for c in query_db('''
-                    select * from categories''')]
-
-
 def formatted_question(question_id=None, question=None):
     if question is not None:
         q = question
@@ -146,7 +138,7 @@ def formatted_question(question_id=None, question=None):
         return None
     return dict([('question_id', q['question_id']), 
                ('question_text', q['question_text']),
-               ('question_timelapse', get_timelapse_string(q['pub_date'])),
+               ('pub_date', q['pub_date']),
                ('question_user', get_user_info(user_id=q['user_id'])),
                ('question_category', get_category(
                             category_id=q['category_id'])['category_name'])]) 
@@ -171,23 +163,28 @@ def formatted_answer_count(question_id):
     return (n_count, y_count)
 
 
-def get_timelapse_string(dt):
-    '''Returns a string for displaying how long since the supplied timelapse.'''
-    diff = (datetime.utcnow() - 
-            datetime.strptime(dt, '%Y-%m-%d %H:%M:%S.%f')).total_seconds()
-    if diff > (60*60*24):
-        rs = '%d days' % (diff // (60*60*24))
-        return rs[:-1] if rs.startswith('1') else rs
-    elif diff > (60*60):
-        rs = '%d hours' % (diff // (60*60))
-        return rs[:-1] if rs.startswith('1') else rs
-    elif diff > 60:
-        rs = '%d minutes' % (diff // 60)
-        return rs[:1] if rs.startswith('1') else rs
-    rs = '%d seconds' % diff
-    return rs[:-1] if diff == 1 else rs
-        
-    
+def time_since(dt, default="just now"):
+    """Returns string representing "time since" e.g. 
+       3 days ago, 5 hours ago, etc...
+    """
+    now = datetime.utcnow()
+    diff = (now - datetime.strptime(dt, '%Y-%m-%d %H:%M:%S.%f'))
+
+    periods = (
+            (diff.days // 365, "year", "years"), 
+            (diff.days // 30, "month", "months"),
+            (diff.days // 7, "week", "weeks"),
+            (diff.days, "day", "days"),
+            (diff.seconds // 3600, "hour", "hours"),
+            (diff.seconds // 60, "minute", "minutes"),
+            (diff.seconds, "second", "seconds"),
+        )
+    for period, singular, plural in periods:
+        if period: 
+            return '%d %s ago' % (period, singular if period == 1 else plural)
+    return default
+
+
 @app.before_request
 def before_request():
     '''Makes sure we have a live connection to the app's database before 
@@ -288,9 +285,12 @@ def add_question():
         g.db.commit()
         flash("your question was successfully added, awesome!")
         return redirect(url_for('homepage'))
-    return render_template('add-question.html', 
-                                     form=form, 
-                                     categories=formatted_category_tuples())
+    return render_template(
+            'add-question.html', 
+            form=form,
+            categories=query_db(
+                'select category_id, category_name from categories')
+            )
 
 
 @app.route('/random/<category>')
@@ -299,8 +299,13 @@ def random_question_page(category=None):
     """Returns a single random question for display. 
        A category may be specified.
     """
-    q = get_questions(category=category, random=True)
-    
+    try:
+        q = get_questions(category=category, random=True)
+    except IndexError:
+        flash('oops, no questions for that category yet... Help us out \
+                and post one!', 'warning')
+        return redirect(url_for('add_question') if g.user 
+                else url_for('homepage'))
     # TODO this is also a dumb hack FIX IT!
     return redirect(url_for(
             'question_permapage', 
@@ -321,7 +326,7 @@ def categories_main():
         g.db.commit()
         flash('Your category has been submitted for review')
         return redirect(url_for('homepage'))
-    categories = formatted_category_tuples()
+    categories = query_db('select category_id, category_name from categories')
     return render_template('categories.html', form=form, categories=categories)
 
 
@@ -405,6 +410,8 @@ def login():
         else:
             session['user_id'] = user_attempt['user_id']
             flash('you were successfully logged in')
+            if request.args.get('next'):
+                return redirect(url_for(request.args.get('next')))
             return redirect(url_for('homepage'))
     return render_template('login.html', form=form, error=error)
 
@@ -426,6 +433,9 @@ def about_info():
 def contact_info():
     return render_template('contact.html')
 
+
+# Add some template filters to jinja
+app.jinja_env.filters['time_since'] = time_since
 
 # For running in shell/standalone
 # DO NOT RUN DEBUG IN PRODUCTION!!!!!!!

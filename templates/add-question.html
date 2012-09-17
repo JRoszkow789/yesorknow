@@ -21,7 +21,8 @@
             {% if categories %}
                 <select name="category">
                 {% for cat in categories %}
-                    <option value="{{ cat[0] }}">{{ cat[1] }}</option>
+                <option value="{{ cat.category_id }}">
+                    {{ cat.category_name }}</option>
                 {% endfor %}
                 </select>
             {% endif %}
